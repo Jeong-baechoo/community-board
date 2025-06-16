@@ -1,5 +1,6 @@
 package com.example.communityboard.member.infrastructure.persistence;
 
+import com.example.communityboard.common.config.JpaConfig;
 import com.example.communityboard.member.domain.entity.Member;
 import com.example.communityboard.member.domain.repository.MemberRepository;
 import com.example.communityboard.member.domain.vo.Email;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(MemberRepositoryImpl.class)
+@Import({MemberRepositoryImpl.class, JpaConfig.class})
 class MemberRepositoryImplTest {
 
     @Autowired
@@ -30,7 +31,7 @@ class MemberRepositoryImplTest {
     @BeforeEach
     void setUp() {
         passwordEncoder = new BCryptPasswordEncoder();
-        Member member = Member.register(
+        Member member = Member.registerMember(
                 "testuser",
                 "password123!",
                 "테스트유저",
@@ -44,7 +45,7 @@ class MemberRepositoryImplTest {
     @DisplayName("회원을 저장할 수 있다")
     void save() {
         // given
-        Member newMember = Member.register(
+        Member newMember = Member.registerMember(
                 "newuser",
                 "newpass123!",
                 "새유저",

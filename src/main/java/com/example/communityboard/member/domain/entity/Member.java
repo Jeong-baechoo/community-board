@@ -32,33 +32,40 @@ public class Member extends BaseEntity {
     @Embedded
     private Email email;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    private Member(LoginId loginId, Password password, Nickname nickname, Email email) {
+    private Member(LoginId loginId, Password password, Nickname nickname, Email email, Role role) {
         this.loginId = loginId;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
+        this.role = role;
     }
 
-    public static Member register(String loginId, String password, String nickname, String email, PasswordEncoder encoder){
+    public static Member registerMember(String loginId, String password, String nickname, String email, PasswordEncoder encoder){
         return new Member(
             LoginId.of(loginId),
             Password.ofRaw(password, encoder),
             Nickname.of(nickname),
-            Email.of(email)
+            Email.of(email),
+            Role.MEMBER
         );
     }
-    
-    // DB에서 조회할 때 사용 (이미 암호화된 비밀번호)
-    public static Member fromDatabase(Long id, String loginId, String encryptedPassword, String nickname, String email){
-        Member member = new Member(
+
+    public static Member registerAdmin(String loginId, String password, String nickname, String email, PasswordEncoder encoder){
+        return new Member(
             LoginId.of(loginId),
-            Password.ofEncrypted(encryptedPassword),
+            Password.ofRaw(password, encoder),
             Nickname.of(nickname),
-            Email.of(email)
+            Email.of(email),
+            Role.ADMIN
         );
-        member.id = id;
-        return member;
+    }
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
     }
 
     public void changePassword(String newPassword, PasswordEncoder encoder){

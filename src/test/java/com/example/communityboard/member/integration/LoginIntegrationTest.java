@@ -42,7 +42,7 @@ class LoginIntegrationTest {
     void setUp() {
         passwordEncoder = new BCryptPasswordEncoder();
         // 테스트용 회원 데이터 생성
-        Member member = Member.register(
+        Member member = Member.registerMember(
                 "testuser",
                 "password123!",
                 "테스트유저",
