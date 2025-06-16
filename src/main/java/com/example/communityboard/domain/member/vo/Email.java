@@ -29,7 +29,7 @@ public class Email {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("이메일은 필수입니다.");
         }
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        String emailRegex = "^[A-Za-z0-9]([A-Za-z0-9._+-]*[A-Za-z0-9])?@[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?\\.[A-Za-z]{2,}$";
         if (!value.matches(emailRegex)) {
             throw new IllegalArgumentException("유효한 이메일 형식이 아닙니다.");
         }

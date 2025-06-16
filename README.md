@@ -130,7 +130,39 @@ private String loginId;
    - 중복 검사 로직
    - 암호화 처리
 
-## 결론
+## 6. Repository 계층 분리 설계
 
-DDD는 완벽한 설계보다는 **도메인을 잘 표현하는 설계**가 중요합니다. 
-기술적 제약(JPA)과 도메인 순수성 사이에서 적절한 균형을 찾는 것이 핵심입니다.
+### 6.1 구조
+```
+domain/member/repository/MemberRepository.java      # 도메인 인터페이스
+infrastructure/persistence/member/
+├── MemberRepositoryImpl.java                      # 인터페이스 구현체
+└── MemberJpaRepository.java                       # Spring Data JPA
+```
+
+### 6.2 설계 의도
+- **의존성 역전 원칙(DIP)**: 도메인이 인프라에 의존하지 않고, 인프라가 도메인에 의존
+
+### 6.3 장점
+1. **테스트 용이성**: Mock 객체로 쉽게 대체 가능
+2. **기술 독립성**: JPA → MyBatis 등 기술 스택 변경 시 도메인 코드 수정 불필요
+3. **명확한 계층 분리**: 각 계층의 책임이 명확함
+4. **다중 구현 지원**: 상황별 다른 구현체 사용 가능 (캐싱, 인메모리 등)
+
+### 6.4 트레이드오프
+1. **복잡도 증가**: 단순한 CRUD에도 인터페이스/구현체 분리
+2. **코드 중복**: 메서드 시그니처가 여러 곳에 반복
+3. **개발 속도**: 초기 구현 시 더 많은 코드 작성 필요
+
+### 6.5 실용적 접근
+```java
+// 복잡한 도메인 로직이 있는 경우 - 분리 권장
+public interface OrderRepository {
+    Order findByIdWithItems(Long id);
+    List<Order> findPendingOrdersWithDelivery();
+}
+
+// 단순 CRUD만 있는 경우 - 직접 JpaRepository 사용 고려
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+}
+```
