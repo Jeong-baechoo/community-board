@@ -33,7 +33,7 @@ class MemberTest {
         String email = "test@example.com";
 
         // when
-        Member member = Member.register(loginId, password, nickname, email, passwordEncoder);
+        Member member = Member.registerMember(loginId, password, nickname, email, passwordEncoder);
 
         // then
         assertThat(member).isNotNull();
@@ -53,7 +53,7 @@ class MemberTest {
         String email = "test@example.com";
 
         // when & then
-        assertThatThrownBy(() -> Member.register(invalidLoginId, password, nickname, email, passwordEncoder))
+        assertThatThrownBy(() -> Member.registerMember(invalidLoginId, password, nickname, email, passwordEncoder))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("아이디는 4자 이상 20자 이하여야 합니다.");
     }
@@ -68,7 +68,7 @@ class MemberTest {
         String email = "test@example.com";
 
         // when & then
-        assertThatThrownBy(() -> Member.register(loginId, invalidPassword, nickname, email, passwordEncoder))
+        assertThatThrownBy(() -> Member.registerMember(loginId, invalidPassword, nickname, email, passwordEncoder))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("비밀번호는 최소 8자 이상이어야 합니다.");
     }
@@ -77,7 +77,7 @@ class MemberTest {
     @DisplayName("비밀번호 변경 성공")
     void changePassword_Success() {
         // given
-        Member member = Member.register("testuser123", "OldPassword123!", "테스터", "test@example.com", passwordEncoder);
+        Member member = Member.registerMember("testuser123", "OldPassword123!", "테스터", "test@example.com", passwordEncoder);
         String newPassword = "NewPassword456!";
 
         // when
@@ -92,7 +92,7 @@ class MemberTest {
     @DisplayName("잘못된 비밀번호로 변경 시 예외 발생")
     void changePassword_InvalidPassword_ThrowsException() {
         // given
-        Member member = Member.register("testuser123", "OldPassword123!", "테스터", "test@example.com", passwordEncoder);
+        Member member = Member.registerMember("testuser123", "OldPassword123!", "테스터", "test@example.com", passwordEncoder);
         String invalidPassword = "short";
 
         // when & then
@@ -105,7 +105,7 @@ class MemberTest {
     @DisplayName("닉네임 변경 성공")
     void changeNickname_Success() {
         // given
-        Member member = Member.register("testuser123", "Password123!", "테스터", "test@example.com", passwordEncoder);
+        Member member = Member.registerMember("testuser123", "Password123!", "테스터", "test@example.com", passwordEncoder);
         String newNickname = "새닉네임";
 
         // when
@@ -119,7 +119,7 @@ class MemberTest {
     @DisplayName("이메일 변경 성공")
     void changeEmail_Success() {
         // given
-        Member member = Member.register("testuser123", "Password123!", "테스터", "test@example.com", passwordEncoder);
+        Member member = Member.registerMember("testuser123", "Password123!", "테스터", "test@example.com", passwordEncoder);
         String newEmail = "newemail@example.com";
 
         // when
@@ -134,7 +134,7 @@ class MemberTest {
     void matchPassword_CorrectPassword_ReturnsTrue() {
         // given
         String rawPassword = "Password123!";
-        Member member = Member.register("testuser123", rawPassword, "테스터", "test@example.com", passwordEncoder);
+        Member member = Member.registerMember("testuser123", rawPassword, "테스터", "test@example.com", passwordEncoder);
 
         // when & then
         assertThat(member.matchPassword(rawPassword, passwordEncoder)).isTrue();
@@ -144,7 +144,7 @@ class MemberTest {
     @DisplayName("비밀번호 일치 확인 - 잘못된 비밀번호")
     void matchPassword_IncorrectPassword_ReturnsFalse() {
         // given
-        Member member = Member.register("testuser123", "Password123!", "테스터", "test@example.com", passwordEncoder);
+        Member member = Member.registerMember("testuser123", "Password123!", "테스터", "test@example.com", passwordEncoder);
 
         // when & then
         assertThat(member.matchPassword("WrongPassword456!", passwordEncoder)).isFalse();

@@ -56,7 +56,7 @@ public class MemberService {
         }
         
         // 회원 생성 및 저장
-        Member member = Member.register(
+        Member member = Member.registerMember(
                 request.getLoginId(),
                 request.getPassword(),
                 request.getNickname(),
