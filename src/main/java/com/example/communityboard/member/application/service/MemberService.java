@@ -7,6 +7,7 @@ import com.example.communityboard.member.domain.entity.Member;
 import com.example.communityboard.member.domain.repository.MemberRepository;
 import com.example.communityboard.member.domain.vo.LoginId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest request) {
         LoginId loginId = LoginId.of(request.getLoginId());
@@ -23,7 +25,7 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(InvalidLoginException::new);
         
-        if (!member.matchPassword(request.getPassword())) {
+        if (!member.matchPassword(request.getPassword(), passwordEncoder)) {
             throw new InvalidLoginException();
         }
         

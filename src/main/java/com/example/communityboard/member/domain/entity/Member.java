@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "members")
@@ -32,19 +33,36 @@ public class Member extends BaseEntity {
     private Email email;
 
 
-    private Member(String loginId, String password, String nickname, String email) {
-        this.loginId = LoginId.of(loginId);
-        this.password = Password.of(password);
-        this.nickname = Nickname.of(nickname);
-        this.email = Email.of(email);
+    private Member(LoginId loginId, Password password, Nickname nickname, Email email) {
+        this.loginId = loginId;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
     }
 
-    public static Member register(String loginId, String password, String nickname, String email){
-        return new Member(loginId, password, nickname, email);
+    public static Member register(String loginId, String password, String nickname, String email, PasswordEncoder encoder){
+        return new Member(
+            LoginId.of(loginId),
+            Password.ofRaw(password, encoder),
+            Nickname.of(nickname),
+            Email.of(email)
+        );
+    }
+    
+    // DB에서 조회할 때 사용 (이미 암호화된 비밀번호)
+    public static Member fromDatabase(Long id, String loginId, String encryptedPassword, String nickname, String email){
+        Member member = new Member(
+            LoginId.of(loginId),
+            Password.ofEncrypted(encryptedPassword),
+            Nickname.of(nickname),
+            Email.of(email)
+        );
+        member.id = id;
+        return member;
     }
 
-    public void changePassword(String newPassword){
-        this.password = Password.of(newPassword);
+    public void changePassword(String newPassword, PasswordEncoder encoder){
+        this.password = Password.ofRaw(newPassword, encoder);
     }
 
     public void changeNickname(String newNickname){
@@ -55,8 +73,8 @@ public class Member extends BaseEntity {
         this.email = Email.of(newEmail);
     }
 
-    public boolean matchPassword(String rawPassword) {
-        return this.password.match(rawPassword);
+    public boolean matchPassword(String rawPassword, PasswordEncoder encoder) {
+        return this.password.match(rawPassword, encoder);
     }
 
 }

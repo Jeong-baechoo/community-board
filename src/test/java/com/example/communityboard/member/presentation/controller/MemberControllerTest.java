@@ -4,13 +4,16 @@ import com.example.communityboard.member.application.dto.LoginRequest;
 import com.example.communityboard.member.application.dto.LoginResponse;
 import com.example.communityboard.member.application.exception.InvalidLoginException;
 import com.example.communityboard.member.application.service.MemberService;
+import com.example.communityboard.common.config.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -19,7 +22,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(MemberController.class)
+@WebMvcTest(controllers = MemberController.class)
+@Import(TestSecurityConfig.class)
 class MemberControllerTest {
 
     @Autowired
@@ -33,6 +37,7 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("로그인 성공시 200 OK와 회원 정보를 반환한다")
+    @WithMockUser
     void loginSuccess() throws Exception {
         // given
         LoginRequest request = new LoginRequest("testuser", "password123!");
@@ -56,6 +61,7 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("로그인 실패시 401 UNAUTHORIZED를 반환한다")
+    @WithMockUser
     void loginFail() throws Exception {
         // given
         LoginRequest request = new LoginRequest("wronguser", "wrongpassword");

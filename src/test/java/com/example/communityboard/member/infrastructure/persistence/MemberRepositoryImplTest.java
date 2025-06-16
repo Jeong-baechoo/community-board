@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -22,15 +24,18 @@ class MemberRepositoryImplTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    private PasswordEncoder passwordEncoder;
     private Member savedMember;
 
     @BeforeEach
     void setUp() {
+        passwordEncoder = new BCryptPasswordEncoder();
         Member member = Member.register(
                 "testuser",
                 "password123!",
                 "테스트유저",
-                "test@example.com"
+                "test@example.com",
+                passwordEncoder
         );
         savedMember = memberRepository.save(member);
     }
@@ -43,7 +48,8 @@ class MemberRepositoryImplTest {
                 "newuser",
                 "newpass123!",
                 "새유저",
-                "new@example.com"
+                "new@example.com",
+                passwordEncoder
         );
 
         // when

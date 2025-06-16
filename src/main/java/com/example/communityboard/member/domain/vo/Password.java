@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Objects;
 
@@ -15,14 +16,28 @@ public class Password {
 
     @Column(name = "password", nullable = false)
     private String value;
+    
+    private static final String BCRYPT_PREFIX = "$2a$";
+    private static final String BCRYPT_PREFIX_2 = "$2b$";
+    private static final String BCRYPT_PREFIX_3 = "$2y$";
 
     private Password(String value) {
-        validate(value);
         this.value = value;
     }
+    
+    private Password(String rawPassword, PasswordEncoder encoder) {
+        validate(rawPassword);
+        this.value = encoder.encode(rawPassword);
+    }
 
-    public static Password of(String value) {
-        return new Password(value);
+    // 암호화된 비밀번호로 생성 (DB에서 조회할 때)
+    public static Password ofEncrypted(String encryptedValue) {
+        return new Password(encryptedValue);
+    }
+    
+    // 평문 비밀번호로 생성 (회원가입, 비밀번호 변경 시)
+    public static Password ofRaw(String rawPassword, PasswordEncoder encoder) {
+        return new Password(rawPassword, encoder);
     }
 
     private void validate(String value) {
@@ -43,8 +58,18 @@ public class Password {
         }
     }
 
-    public boolean match(String rawPassword) {
-        return this.value.equals(rawPassword);
+    public boolean match(String rawPassword, PasswordEncoder encoder) {
+        if (rawPassword == null) {
+            return false;
+        }
+        return encoder.matches(rawPassword, this.value);
+    }
+    
+    // 암호화되어 있는지 확인
+    public boolean isEncrypted() {
+        return value != null && (value.startsWith(BCRYPT_PREFIX) || 
+               value.startsWith(BCRYPT_PREFIX_2) || 
+               value.startsWith(BCRYPT_PREFIX_3));
     }
 
     @Override

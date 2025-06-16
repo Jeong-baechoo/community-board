@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +36,18 @@ class LoginIntegrationTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setUp() {
+        passwordEncoder = new BCryptPasswordEncoder();
         // 테스트용 회원 데이터 생성
         Member member = Member.register(
                 "testuser",
                 "password123!",
                 "테스트유저",
-                "test@example.com"
+                "test@example.com",
+                passwordEncoder
         );
         memberRepository.save(member);
     }
