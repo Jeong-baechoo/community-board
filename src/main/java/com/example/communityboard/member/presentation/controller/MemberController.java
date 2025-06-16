@@ -6,6 +6,7 @@ import com.example.communityboard.member.application.dto.LoginResponse;
 import com.example.communityboard.member.application.dto.SignupRequest;
 import com.example.communityboard.member.application.dto.SignupResponse;
 import com.example.communityboard.member.application.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,13 +22,13 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<SignupResponse>> signup(@RequestBody SignupRequest request){
+    public ResponseEntity<ApiResponse<SignupResponse>> signup(@Valid @RequestBody SignupRequest request){
         SignupResponse response = memberService.signup(request);
         return ResponseEntity.ok(ApiResponse.success(response,"회원가입에 성공했습니다."));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = memberService.login(request);
         return ResponseEntity.ok(ApiResponse.success(response, "로그인에 성공했습니다."));
     }
