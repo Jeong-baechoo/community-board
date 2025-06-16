@@ -54,4 +54,8 @@ public class Member extends BaseEntity {
         this.email = Email.of(newEmail);
     }
 
+    public boolean matchPassword(String rawPassword) {
+        return this.password.match(rawPassword);
+    }
+
 }

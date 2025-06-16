@@ -87,23 +87,23 @@ class PasswordTest {
 
     @Test
     @DisplayName("비밀번호 일치 확인 - 같은 비밀번호")
-    void matches_SamePassword_ReturnsTrue() {
+    void match_SamePassword_ReturnsTrue() {
         // given
         String rawPassword = "Password123!";
         Password password = Password.of(rawPassword);
 
         // when & then
-        assertThat(password.matches(rawPassword)).isTrue();
+        assertThat(password.match(rawPassword)).isTrue();
     }
 
     @Test
     @DisplayName("비밀번호 일치 확인 - 다른 비밀번호")
-    void matches_DifferentPassword_ReturnsFalse() {
+    void match_DifferentPassword_ReturnsFalse() {
         // given
         Password password = Password.of("Password123!");
 
         // when & then
-        assertThat(password.matches("WrongPassword456!")).isFalse();
+        assertThat(password.match("WrongPassword456!")).isFalse();
     }
 
     @Test

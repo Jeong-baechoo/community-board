@@ -73,7 +73,7 @@ class MemberTest {
         member.changePassword(newPassword);
 
         // then
-        assertThat(member.getPassword().matches(newPassword)).isTrue();
+        assertThat(member.getPassword().match(newPassword)).isTrue();
     }
 
     @Test

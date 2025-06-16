@@ -43,7 +43,7 @@ public class Password {
         }
     }
 
-    public boolean matches(String rawPassword) {
+    public boolean match(String rawPassword) {
         return this.value.equals(rawPassword);
     }
 
