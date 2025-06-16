@@ -113,7 +113,7 @@ class LoginIntegrationTest {
     }
 
     @Test
-    @DisplayName("필수 파라미터가 누락되면 401 에러를 반환한다")
+    @DisplayName("필수 파라미터가 누락되면 400 에러를 반환한다")
     void loginFailWithMissingParameter() throws Exception {
         // given
         Map<String, String> loginRequest = new HashMap<>();
@@ -125,8 +125,8 @@ class LoginIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andDo(print())
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.message").value("아이디 또는 비밀번호가 올바르지 않습니다."));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("password: 비밀번호는 필수입니다"));
     }
 }

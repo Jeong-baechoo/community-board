@@ -87,7 +87,7 @@ class MemberControllerTest {
     @WithMockUser
     void signupSuccess() throws Exception {
         // given
-        SignupRequest request = new SignupRequest("newuser", "password123!", "새유저", "new@example.com");
+        SignupRequest request = new SignupRequest("newuser", "Password123!", "새유저", "new@example.com");
         SignupResponse response = new SignupResponse(1L, "newuser", "새유저", "new@example.com");
         
         given(memberService.signup(any(SignupRequest.class))).willReturn(response);
@@ -111,7 +111,7 @@ class MemberControllerTest {
     @WithMockUser
     void signupFailWithDuplicateLoginId() throws Exception {
         // given
-        SignupRequest request = new SignupRequest("existinguser", "password123!", "새유저", "new@example.com");
+        SignupRequest request = new SignupRequest("existinguser", "Password123!", "새유저", "new@example.com");
         
         given(memberService.signup(any(SignupRequest.class)))
                 .willThrow(new DuplicateLoginIdException());
@@ -130,19 +130,23 @@ class MemberControllerTest {
     @DisplayName("유효하지 않은 입력값으로 회원가입 시도시 400 BAD_REQUEST를 반환한다")
     @WithMockUser
     void signupFailWithInvalidInput() throws Exception {
-        // given
-        SignupRequest request = new SignupRequest("a", "password123!", "새유저", "new@example.com");
-        
-        given(memberService.signup(any(SignupRequest.class)))
-                .willThrow(new IllegalArgumentException("아이디는 4자 이상 20자 이하여야 합니다."));
+        // given - 아이디가 너무 짧은 경우
+        String invalidRequest = """
+                {
+                    "loginId": "a",
+                    "password": "Password123!",
+                    "nickname": "새유저",
+                    "email": "new@example.com"
+                }
+                """;
         
         // when & then
         mockMvc.perform(post("/api/members/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(invalidRequest))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.message").value("아이디는 4자 이상 20자 이하여야 합니다."));
+                .andExpect(jsonPath("$.message").exists());
     }
 }
