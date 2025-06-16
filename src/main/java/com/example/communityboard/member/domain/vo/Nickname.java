@@ -12,6 +12,10 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Nickname {
+    
+    private static final int MIN_LENGTH = 2;
+    private static final int MAX_LENGTH = 10;
+    private static final String ALLOWED_PATTERN = "^[가-힣a-zA-Z0-9]+$";
 
     @Column(name = "nickname", nullable = false, unique = true)
     private String value;
@@ -29,10 +33,12 @@ public class Nickname {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("닉네임은 필수입니다.");
         }
-        if (value.length() < 2 || value.length() > 10) {
-            throw new IllegalArgumentException("닉네임은 2자 이상 10자 이하여야 합니다.");
+        if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException(
+                String.format("닉네임은 %d자 이상 %d자 이하여야 합니다.", MIN_LENGTH, MAX_LENGTH)
+            );
         }
-        if (!value.matches("^[가-힣a-zA-Z0-9]+$")) {
+        if (!value.matches(ALLOWED_PATTERN)) {
             throw new IllegalArgumentException("닉네임은 한글, 영문, 숫자만 사용 가능합니다.");
         }
     }

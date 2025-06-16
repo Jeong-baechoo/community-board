@@ -14,12 +14,17 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Password {
 
-    @Column(name = "password", nullable = false)
-    private String value;
-    
+    private static final int MIN_LENGTH = 8;
+    private static final int MIN_TYPE_COUNT = 2;
+    private static final String LETTER_PATTERN = ".*[a-zA-Z].*";
+    private static final String NUMBER_PATTERN = ".*[0-9].*";
+    private static final String SPECIAL_CHAR_PATTERN = ".*[!@#$%^&*()_+\\-=\\[\\]{};':.,<>?/].*";
     private static final String BCRYPT_PREFIX = "$2a$";
     private static final String BCRYPT_PREFIX_2 = "$2b$";
     private static final String BCRYPT_PREFIX_3 = "$2y$";
+    
+    @Column(name = "password", nullable = false)
+    private String value;
 
     private Password(String value) {
         this.value = value;
@@ -44,17 +49,21 @@ public class Password {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("비밀번호는 필수입니다.");
         }
-        if (value.length() < 8) {
-            throw new IllegalArgumentException("비밀번호는 최소 8자 이상이어야 합니다.");
+        if (value.length() < MIN_LENGTH) {
+            throw new IllegalArgumentException(
+                String.format("비밀번호는 최소 %d자 이상이어야 합니다.", MIN_LENGTH)
+            );
         }
 
         int typeCount = 0;
-        if (value.matches(".*[a-zA-Z].*")) typeCount++;
-        if (value.matches(".*[0-9].*")) typeCount++;
-        if (value.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':.,<>?/].*")) typeCount++;
+        if (value.matches(LETTER_PATTERN)) typeCount++;
+        if (value.matches(NUMBER_PATTERN)) typeCount++;
+        if (value.matches(SPECIAL_CHAR_PATTERN)) typeCount++;
 
-        if (typeCount < 2) {
-            throw new IllegalArgumentException("비밀번호는 영문, 숫자, 특수문자 중 2종류 이상 포함해야 합니다.");
+        if (typeCount < MIN_TYPE_COUNT) {
+            throw new IllegalArgumentException(
+                String.format("비밀번호는 영문, 숫자, 특수문자 중 %d종류 이상 포함해야 합니다.", MIN_TYPE_COUNT)
+            );
         }
     }
 

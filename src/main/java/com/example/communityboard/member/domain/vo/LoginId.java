@@ -12,6 +12,10 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginId {
+    
+    private static final int MIN_LENGTH = 4;
+    private static final int MAX_LENGTH = 20;
+    private static final String ALLOWED_PATTERN = "^[a-zA-Z0-9]+$";
 
     @Column(name = "login_id", nullable = false, unique = true)
     private String value;
@@ -29,10 +33,12 @@ public class LoginId {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("아이디는 필수입니다.");
         }
-        if (value.length() < 4 || value.length() > 20) {
-            throw new IllegalArgumentException("아이디는 4자 이상 20자 이하여야 합니다.");
+        if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException(
+                String.format("아이디는 %d자 이상 %d자 이하여야 합니다.", MIN_LENGTH, MAX_LENGTH)
+            );
         }
-        if (!value.matches("^[a-zA-Z0-9]+$")) {
+        if (!value.matches(ALLOWED_PATTERN)) {
             throw new IllegalArgumentException("아이디는 영문과 숫자만 사용 가능합니다.");
         }
     }
