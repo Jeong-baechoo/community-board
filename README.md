@@ -1,17 +1,48 @@
 # Community Board - DDD 기반 게시판 프로젝트
 
+## 프로젝트 개요
+
+Spring Boot와 Domain-Driven Design(DDD)을 기반으로 구현한 커뮤니티 게시판 프로젝트입니다.
+
+### 기술 스택
+- **Backend**: Spring Boot 3.5.0, Java 21
+- **Database**: H2 (개발), MySQL (운영 예정)
+- **Security**: Spring Security (JWT 미사용)
+- **Build**: Gradle 8.14.2
+- **CI/CD**: GitHub Actions
+- **Container**: Docker, Docker Hub
+- **Architecture**: Domain-Driven Design (DDD)
+
 ## 프로젝트 구조
 
+### Feature-first Architecture (기능 우선 구조)
 ```
 src/main/java/com/example/communityboard/
-├── domain/           # 도메인 계층
-│   ├── member/      # 회원 도메인
-│   ├── board/       # 게시판 도메인
-│   └── comment/     # 댓글 도메인
-├── application/     # 응용 계층
-├── infrastructure/  # 인프라 계층
-└── presentation/    # 표현 계층
+├── member/                     # 회원 도메인
+│   ├── domain/                # 도메인 계층
+│   │   ├── entity/           # Member 엔티티
+│   │   ├── vo/              # 값 객체 (LoginId, Password, Email, Nickname)
+│   │   └── repository/       # 도메인 인터페이스
+│   ├── application/          # 응용 계층
+│   │   ├── service/         # MemberService
+│   │   ├── dto/             # LoginRequest, SignupRequest, MemberResponse
+│   │   └── exception/       # 도메인 예외
+│   ├── infrastructure/       # 인프라 계층
+│   │   └── persistence/     # JPA 구현체
+│   └── presentation/         # 표현 계층
+│       └── controller/      # MemberController
+├── board/                      # 게시판 도메인 (예정)
+├── comment/                    # 댓글 도메인 (예정)
+└── common/                     # 공통 모듈
+    ├── config/                # 설정 (Security, JPA 등)
+    ├── dto/                   # 공통 응답 DTO
+    └── exception/             # 전역 예외 처리
 ```
+
+### 구조 변경 이력
+- **이전**: Layer-first (계층 우선) - domain/, application/, infrastructure/, presentation/
+- **현재**: Feature-first (기능 우선) - member/, board/, comment/
+- **이유**: 각 도메인의 응집도를 높이고, 도메인별 독립적인 개발과 관리가 가능
 
 ## DDD 설계 고민 사항
 
@@ -166,3 +197,89 @@ public interface OrderRepository {
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 }
 ```
+
+## API 엔드포인트
+
+### 회원 관리 API
+
+#### 1. 회원가입
+- **URL**: `POST /api/members/signup`
+- **Request Body**:
+```json
+{
+    "loginId": "testuser123",
+    "password": "Password123!",
+    "nickname": "테스트유저",
+    "email": "test@example.com"
+}
+```
+- **Validation Rules**:
+  - loginId: 4-20자, 영문/숫자만
+  - password: 8-20자, 대소문자/숫자/특수문자 포함
+  - nickname: 2-10자
+  - email: 유효한 이메일 형식
+
+#### 2. 로그인
+- **URL**: `POST /api/members/login`
+- **Request Body**:
+```json
+{
+    "loginId": "testuser123",
+    "password": "Password123!"
+}
+```
+
+## 실행 방법
+
+### 1. 로컬 실행
+```bash
+# 프로젝트 빌드
+./gradlew clean build
+
+# 애플리케이션 실행
+./gradlew bootRun
+```
+
+### 2. Docker 실행
+```bash
+# Docker 이미지 빌드
+docker build -t community-board .
+
+# 컨테이너 실행
+docker run -p 8080:8080 community-board
+
+# Docker Hub에서 최신 이미지 실행
+docker pull baechoo/community-board:latest
+docker run -p 8080:8080 baechoo/community-board:latest
+```
+
+## CI/CD 파이프라인
+
+### GitHub Actions 워크플로우
+1. **트리거**: main, develop, feature/** 브랜치 push/PR
+2. **빌드 및 테스트**: Java 21, Gradle
+3. **테스트 리포트**: JUnit 테스트 결과 자동 생성
+4. **Docker 이미지**: 테스트 성공 시 Docker Hub에 자동 배포
+   - `baechoo/community-board:latest`
+   - `baechoo/community-board:{commit-sha}`
+
+### 필요한 GitHub Secrets
+- `DOCKER_USERNAME`: Docker Hub 사용자명
+- `DOCKER_PASSWORD`: Docker Hub 비밀번호
+
+## 테스트
+
+```bash
+# 전체 테스트 실행
+./gradlew test
+
+# 테스트 리포트 확인
+open build/reports/tests/test/index.html
+```
+
+## 개발 가이드
+
+### 커밋 전 확인사항
+1. 모든 테스트가 통과하는지 확인
+2. 코드 스타일 검사 통과
+3. 빌드가 성공적으로 완료되는지 확인
